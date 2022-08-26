@@ -1,23 +1,89 @@
-import logo from './logo.svg';
+//Install Dependencies Done
+//Import dependencies Done
+//Setup Webcam
+//Define ref
+//load facemesh
+//detect function
+//drawing utilities
+//load triangulation
+//setup triangle path
+//setup point drawing
+//add drawmesh to detect function
+
+
+import React, {useRef} from 'react';
+
 import './App.css';
 
+import * as tf from  "@tensorflow/tfjs";
+import * as facemesh from "@tensorflow-models/facemesh";
+import Webcam from 'react-webcam';
+import { FlipLeftRight } from '@tensorflow/tfjs';
+
 function App() {
+  //setup references
+  const webcamRef = useRef(null);
+  const canvasRef = useRef(null);
+
+  //load facemesh
+  const runFacemesh = async () => {
+    const net = await facemesh.load({
+      inputResolution:{width: 640, height:480}, scale:0.8
+    })
+  }
+
+  //detect function
+  if (typeOf webcamRef.current !== "undefined" && //checking cam is defined
+    webcamRef.current !== null && //cam is not null
+    webcamRef.current.video.readyState === 4) { //cam receiving data
+      //get video properties
+      const video = webcamRef.current.video;
+      const videoWidth = webcamRef.current.video.videoWidth;
+      const videoHeight = webcamRef.current.video.videoHeight;
+      //set video width
+      webcamRef.current.video.width = videoWidth;
+      webcamRef.current.video.height = videoHeight;
+      //set canvas width
+      canvasRef.current.width = videoWidth;
+      canvasRef.current.height = videoHeight;
+      //Make detections
+      const face = await net.estimateFaces(video);
+      console.log(face);
+      //get canvas context for drawing
+
+    }
+
+
+  //putting in camera
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <header className='App Header'>
+      <Webcam ref = {webcamRef}
+      style = {{
+          position: "absolute",
+          marginLeft: "auto",
+          marginRight: "auto",
+          left: 0,
+          right: 0,
+          textAlign: "center",
+          zIndex: 9,
+          width: 640,
+          height: 480
+        }} />
+
+      <canvas ref = {canvasRef}
+      style = {{
+          position: "absolute",
+          marginLeft: "auto",
+          marginRight: "auto",
+          left: 0,
+          right: 0,
+          textAlign: "center",
+          zIndex: 9,
+          width: 640,
+          height: 480
+        }} />
+        </header>
     </div>
   );
 }
